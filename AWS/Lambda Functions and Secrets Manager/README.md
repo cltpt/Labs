@@ -6,7 +6,7 @@
 
 ## Introduction
 
-A $\textcolor{red}{\textsf{common pattern}}$ I see when investigating lambda functions that folks create is that they reference $\textcolor{red}{\textsf{plaintext secret keys in the Lambda environment variables}}$.  This is $\textcolor{red}{\textsf{not a secure pattern}}$ and we should always be storing our secrets in an appropriate secrets store such as AWS Secrets Manager or AWS Systems Manager Parameter Store.  $\textcolor{green}{\textsf{This lab will guide you through the implmenetation of utilziing AWS Secrets Manager secrets through a lambda function with python code.}}$  In addition to simply utilizing the secret, we also add a Lambda Layer which allows us to cache the secret, therefore we're not making an API call to secrets manager every time, reducing cost.
+A $\textcolor{blue}{\textsf{common pattern}}$ I see when investigating lambda functions that folks create is that they reference $\textcolor{blue}{\textsf{plaintext secret keys in the Lambda environment variables}}$.  This is $\textcolor{blue}{\textsf{not a secure pattern}}$ and we should always be storing our secrets in an appropriate secrets store such as AWS Secrets Manager or AWS Systems Manager Parameter Store.  $\textcolor{blue}{\textsf{This lab will guide you through the implmenetation of utilziing AWS Secrets Manager secrets through a lambda function with python code.}}$  In addition to simply utilizing the secret, we also add a Lambda Layer which allows us to cache the secret, therefore we're not making an API call to secrets manager every time, reducing cost.
 
 ### Instructions
 1. Review the picture of how this deployment functions
