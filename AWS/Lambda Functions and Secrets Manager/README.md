@@ -37,7 +37,7 @@ In the python code you'll notice that we define
 For more information on how to integrate the new layer 
 
 ### Step 4: Deploy the terraform code
-The first thing you'll need to do is put your account number in the labmda function terraform code in "put_your_account_number_here".
+The first thing you'll need to do is get your layer ARN.  You can find this by creating a test lambda function and fake add a layer and then copy the arn and put it where the arn is in the layer configuration setting in the "lambda.tf" file.
 
 Then you can run the following terraform commands:
 ```hcl
