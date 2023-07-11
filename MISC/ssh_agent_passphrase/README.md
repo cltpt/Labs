@@ -6,19 +6,19 @@
 
 ## Introduction
 
-One of the $\textcolor{red}{\textsf{main discussion points}}$ I witness when talking with developers about utilizing encrypted (passphrase protected) SSH private keys is "I $\textcolor{red}{\textsf{can't encrypt my ssh private key}}$ because I use it in $\textcolor{red}{\textsf{automated scripts}}$".  We're here to $\textcolor{red}{\textsf{solve a portion}}$ of that discussion point.
+One of the $\textcolor{orange}{\textsf{main discussion points}}$ I witness when talking with developers about utilizing encrypted (passphrase protected) SSH private keys is "I $\textcolor{orange}{\textsf{can't encrypt my ssh private key}}$ because I use it in $\textcolor{orange}{\textsf{automated scripts}}$".  We're here to $\textcolor{orange}{\textsf{solve a portion}}$ of that discussion point.
 
 ### Background on ssh-agent
 
-SSH-Agent is a $\textcolor{red}{\textsf{crucial tool for software developers}}$ that enhances security and $\textcolor{red}{\textsf{simplifies}}$ the process of $\textcolor{red}{\textsf{working with SSH}}$ (Secure Shell) keys. SSH-Agent acts as a secure storage system for your private SSH keys, $\textcolor{red}{\textsf{eliminating}}$ the need to $\textcolor{red}{\textsf{repeatedly enter your passphrase}}$ whenever you want to establish a secure connection. When you add your private key to the SSH-Agent, it securely holds the key in memory, allowing you to authenticate with remote servers without providing the passphrase every time.
+SSH-Agent is a $\textcolor{orange}{\textsf{crucial tool for software developers}}$ that enhances security and $\textcolor{orange}{\textsf{simplifies}}$ the process of $\textcolor{orange}{\textsf{working with SSH}}$ (Secure Shell) keys. SSH-Agent acts as a secure storage system for your private SSH keys, $\textcolor{orange}{\textsf{eliminating}}$ the need to $\textcolor{orange}{\textsf{repeatedly enter your passphrase}}$ whenever you want to establish a secure connection. When you add your private key to the SSH-Agent, it securely holds the key in memory, allowing you to authenticate with remote servers without providing the passphrase every time.
 
-By utilizing SSH-Agent, software developers can enjoy $\textcolor{red}{\textsf{several benefits}}$. First and foremost, it improves convenience by $\textcolor{red}{\textsf{eliminating}}$ the need to $\textcolor{red}{\textsf{repeatedly enter passphrases}}$, thereby saving time and effort. Once the private key is added to the SSH-Agent, it remains active until the system restarts or the user manually removes it. This means that developers can authenticate with various remote servers or repositories seamlessly, without interruption. Additionally, SSH-Agent enhances security by reducing the risk of passphrase exposure. Since the $\textcolor{red}{\textsf{private key remains in memory}}$ and is never transmitted, developers can $\textcolor{red}{\textsf{avoid the potential vulnerability}}$ of passphrases being intercepted or compromised.
+By utilizing SSH-Agent, software developers can enjoy $\textcolor{orange}{\textsf{several benefits}}$. First and foremost, it improves convenience by $\textcolor{orange}{\textsf{eliminating}}$ the need to $\textcolor{orange}{\textsf{repeatedly enter passphrases}}$, thereby saving time and effort. Once the private key is added to the SSH-Agent, it remains active until the system restarts or the user manually removes it. This means that developers can authenticate with various remote servers or repositories seamlessly, without interruption. Additionally, SSH-Agent enhances security by orangeucing the risk of passphrase exposure. Since the $\textcolor{orange}{\textsf{private key remains in memory}}$ and is never transmitted, developers can $\textcolor{orange}{\textsf{avoid the potential vulnerability}}$ of passphrases being intercepted or compromised.
 
-In summary, SSH-Agent simplifies the life of software developers by $\textcolor{red}{\textsf{securely storing private SSH keys}}$, eliminating the need to repeatedly enter passphrases, and providing a seamless and secure authentication experience when connecting to remote servers or repositories. It streamlines the workflow, enhances convenience, and reduces the risk of passphrase exposure, allowing developers to focus on their work without compromising security.
+In summary, SSH-Agent simplifies the life of software developers by $\textcolor{orange}{\textsf{securely storing private SSH keys}}$, eliminating the need to repeatedly enter passphrases, and providing a seamless and secure authentication experience when connecting to remote servers or repositories. It streamlines the workflow, enhances convenience, and reduces the risk of passphrase exposure, allowing developers to focus on their work without compromising security.
 
 ## Better Options
 
-If you're utilizing a $\textcolor{red}{\textsf{cloud environment, this guide is likely not for you}}$.  For example, in an AWS environment with EC2 instances it is less efficent to run batch jobs / automated scripts directly from the EC2 instances.  If you're pulling data from a resource and transferring it, processing data, or simply running an automated job to do something, use a Lambda function and schedule it using AWS EventBridge.  This is a much more effective method of automated jobs rather than utilizing an EC2 instance and running jobs off the EC2 instance.
+If you're utilizing a $\textcolor{orange}{\textsf{cloud environment, this guide is likely not for you}}$.  For example, in an AWS environment with EC2 instances it is less efficent to run batch jobs / automated scripts directly from the EC2 instances.  If you're pulling data from a resource and transferring it, processing data, or simply running an automated job to do something, use a Lambda function and schedule it using AWS EventBridge.  This is a much more effective method of automated jobs rather than utilizing an EC2 instance and running jobs off the EC2 instance.
 
 Read more about how to utilize AWS Lambda, AWS EventBridge and IAM roles here:
 
@@ -34,7 +34,7 @@ Read more about how to utilize AWS Lambda, AWS EventBridge and IAM roles here:
 ## Instructions
 
 ### IMPORTANT Considerations
-$\textcolor{red}{\textsf{Please do not attempt to utilize this terraform code in a production environment, this is meant for testing only.}}$ 
+$\textcolor{orange}{\textsf{Please do not attempt to utilize this terraform code in a production environment, this is meant for testing only.}}$ 
 * If you want to utilize the ssh-agent for reduced passphrase input, please test in a sandbox environment and then into a staging or non-production environment before you deploy into a production environment.
 * If you deploy this strategy into a production environment, ensure that you have some form of reminder to insert the private key at system boot time
 
@@ -129,4 +129,4 @@ source ~/.bashrc
 4. Now that you've added it into your .bashrc file it will prompt you at every reboot for the passphrase to your key
 
 ## Final thoughts
-Thank you for going through this lab today!  If you have any comments, suggestions, etc, please open a pull request and collaborate.
+Thank you for going through this lab today!  If you have any comments, suggestions, etc, please open a pull request and collaborate!
