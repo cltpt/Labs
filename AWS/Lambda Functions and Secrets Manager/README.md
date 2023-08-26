@@ -8,6 +8,8 @@
 
 A $\textcolor{orange}{\textsf{common pattern}}$ I see when investigating lambda functions that folks create is that they reference $\textcolor{orange}{\textsf{plaintext secret keys in the Lambda environment variables}}$.  This is $\textcolor{orange}{\textsf{not a secure pattern}}$ and we should always be storing our secrets in an appropriate secrets store such as AWS Secrets Manager or AWS Systems Manager Parameter Store.  $\textcolor{orange}{\textsf{This lab will guide you through the implmentation of utilizing AWS Secrets Manager secrets through a lambda function with python code.}}$  In addition to simply utilizing the secret, we also add a Lambda Layer which allows us to cache the secret, therefore we're not making an API call to secrets manager every time, reducing cost.
 
+Please do not simply deploy these tf files into production with no editing / configuration changes.  I take no responsibility for you deploying insecure resources and losing data.
+
 ### Instructions
 1. Review the picture of how this lab functions
 2. Review the terraform code associated with this lab

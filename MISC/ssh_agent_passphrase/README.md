@@ -8,6 +8,8 @@
 
 One of the $\textcolor{orange}{\textsf{main discussion points}}$ I witness when talking with developers about utilizing encrypted (passphrase protected) SSH private keys is "I $\textcolor{orange}{\textsf{can't encrypt my ssh private key}}$ because I use it in $\textcolor{orange}{\textsf{automated scripts}}$".  We're here to $\textcolor{orange}{\textsf{solve a portion}}$ of that discussion point.
 
+Please do not simply deploy these tf files into production with no editing / configuration changes.  I take no responsibility for you deploying insecure resources and losing data.
+
 ### Background on ssh-agent
 
 SSH-Agent is a $\textcolor{orange}{\textsf{crucial tool for software developers}}$ that enhances security and $\textcolor{orange}{\textsf{simplifies}}$ the process of $\textcolor{orange}{\textsf{working with SSH}}$ (Secure Shell) keys. SSH-Agent acts as a secure storage system for your private SSH keys, $\textcolor{orange}{\textsf{eliminating}}$ the need to $\textcolor{orange}{\textsf{repeatedly enter your passphrase}}$ whenever you want to establish a secure connection. When you add your private key to the SSH-Agent, it securely holds the key in memory, allowing you to authenticate with remote servers without providing the passphrase every time.
@@ -41,7 +43,7 @@ $\textcolor{orange}{\textsf{Please do not attempt to utilize this terraform code
 
 ### Pre-requsites
 1. Have an AWS account in which you have access to create resources and manage IAM
-2. Have terraform installed on your local system [Terraform install docs](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)S
+2. Have terraform installed on your local system [Terraform install docs](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
 3. Have AWS CLI installed on your local system to configure your access and secret keys [AWS CLI Install docs](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 
 ### Steps
