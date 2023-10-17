@@ -1,4 +1,3 @@
-# DRAFT STATE
 ## Table of Contents ()
 
 - [Introduction](#introduction)
