@@ -37,7 +37,7 @@ There are a few things you'll need to consider when configuring this setting:
 Rather than traditional instructions, think of the following information mainly as a set of considerations when deploying this setting in your tenant.
 
 First, i've created a test user in my tenant called "newportaluser".  This user will serve as our test user in identifying what happens when we enable the setting and what permissions users have by default.
-![TestUserCreation](TestUserCreation.png) (need screenshot of new user)
+![TestUserCreation](TestUserCreation.png)
 
 If you see here, this user has no directly assigned roles.
 ![NoRoles](NoRoles.png)
@@ -112,8 +112,6 @@ As you can see here, I've built a dynamic group that defines who needs access to
 ![NeedsAccess1](NeedsAccess1.png)
 
 NOTE: When you deploy level 2 or 3 you will need to statically assign users/groups who need access to the portal with the directory reader setting.  If your organization utilizes PIM you'll notice that this advise goes directly against typical advice of putting all roles under PIM.  However, if you attempt to deploy level 2 or 3 and you do not assign directory reader to the users they will be unable to get to the PIM portal to checkout any of their roles.
-
-Simply put screenshots of the levels here
 
 Level 1: Enablement of only the "Restrict access to Microsoft Entra administration portal" setting
 ![level1](level1.png)
