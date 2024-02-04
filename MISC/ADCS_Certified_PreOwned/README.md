@@ -485,41 +485,54 @@ An important mention from the SpecterOps team is "The WebServer template has the
 
 
 #### Step 10: Exploit an insecure certificate template (ESC 2)
-$\textcolor{orange}{\textsf{THESE ESC INSTRUCTIONS ARE UNDER CONSTRUCTION}}$
 
 Now that you've exploited ESC 1, let's take a look at ESC 2!  We have to configure another certificate template here so we can exploit it.
 
-What we're going to be accomplishing with this escalation is obtaining a certificate that can ********.  This is less of an escalation and more of a lateral movement opportunity.
+What we're going to be accomplishing with this exploit is obtaining a certificate that can escalate to a different user (only if it's a V1 template).  This escalation utilizes the over-permissive "Any Purpose" EKU
 
 1. Click on the windows button in the lower left hand corner of your screen
 2. Type in Certification Authority and click on the icon
 3. Find the folder for "Certificate Templates"
 4. Right click on the "Certificate Templates" folder and click on "Manage"
-5. Find the "UserInsecureESC1" Certificate template and right click on it
+5. Find the "User" Certificate template and right click on it
 6. Click "Duplicate"
 7. In the newly opened window click into the "General" tab and rename the template to "UserInsecureESC2"
-8. Then you'll want to go to the "Extensions" tab and go to "Application Policies" and add in the "Any Purpose" EKU.
-9. Click "OK"
+8. Then you'll want to go to the "Extensions" tab and go to "Application Policies" and remove all of the EKUs and add only the "AnyPurpose" EKU, then click "OK"
+9. Navigate to the "Subject Name" tab and remove the "Include e-mail name in subject name" and "E-mail name" checkboxes
 10. Click "Apply" and then "OK"
 11. We're not done yet.  Now we need to publish the template so go back to the main certificate authority console where you originally right clicked on "Certificate Templates"
 12. Right click on the "Certificate Templates" folder again click "New" -> "Certificate Template to issue"
 13. Find and click on the certificate template that we just created "UserInsecureESC2" and click "OK"
 14. You may need to wait 60 seconds or so for this template to publish out to AD but since this is a tiny one DC domain, it should publish very fast.
 
-Now we need to enroll in this certificate:
+Now we need to enroll in this certificate.  Open up a session with your TestUser user in the USERVM.  Then run the following commands:
 
 1. Click on the windows button and type in "Run", hit enter to open up the run prompt
 2. Type in "certmgr.msc" and hit enter
-3. Go up to the upper left hand corner of the mmc console and click "File" -> "Add Remove Snap-ins"
-4. Click "Certificates" and "Add"
-5. Click "Okay"
-6. Navigate to the personal folder under the user's certificate store
-7. Right click and "Personal" folder and click "All Tasks" -> "Request new certificate"
-8. Click "OK"
-9. On the certificate template selector, click on the UserInsecureESC2 template and click "Enroll"
-10. Congrats!  Now we have a certificate that will allow us to do anything (such as sign code) a certificate can possibly do!
-11. In an attack scenario you'll likely want to export this certificate somewhere else where you can sign code and then distribute out your attacking code to the victim machines.
+3. Navigate to the personal folder under the user's certificate store and then click into "Certificates"
+4. Right click in the white space and click "All Tasks" -> "Request new certificate"
+5. Click "Next" and "Next"
+6. On the certificate template selector, click on the UserInsecureESC2 template and click "Enroll"
+7. Congrats!  Now we have a certificate that will allow us to do anything a certificate can possibly do!
 
+Now let's export our certificate and move it to where we'll run Certify.exe again
+
+1. Right click on the certificate just issued and click "All Tasks" --> "Export"
+2. Click "Next"
+3. Check the "Yes, export the private key"
+4. Leave all the defaults on the Export file format page
+5. Set a password such as Password123!
+6. Change the encryption to "AES256-SHA256" and click "Next"
+7. Choose the file location where the Certify.exe is stored and name the file mycert (the extension will be automatically added)
+8. Click "Export"
+
+Run the following command to use Certify to request a certificate to the CA on behalf of the adcsuser
+```cmd
+Certify.exe request /ca:ADCSVM.testdomain.local\testca.testdomain.local /enrollcert:mycert.pfx /enrollcertpw:Password123! /template:User /onbehalfof:testdomain\adcsuser
+```
+![My Image](anyp.png)
+
+Congrats!  Now you can follow the previous steps as in ESC1 to request a TGT under the guise of the adcsuser!
 
 #### Step 11: Exploit an insecure certificate template (ESC 3)
 $\textcolor{orange}{\textsf{THESE ESC INSTRUCTIONS ARE UNDER CONSTRUCTION}}$
