@@ -1,0 +1,29 @@
+# Store the Safe Mode Admin password as a Secure-String
+$SMAP = testing123!!!@#ConvertTo-SecureString -AsPlainText $SafeModeAdministratorPassword -Force
+
+# Install Active Directory Domain Services feature
+Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+
+# Promote the server to a domain controller
+# Removed ($Domain_DNSName, $Domain_NETBIOSName)
+Install-ADDSForest -CreateDnsDelegation:$false -DatabasePath "C:\Windows\NTDS" -DomainMode "WinThreshold" -DomainName testdomain.local -DomainNetbiosName TESTDOMAIN -ForestMode "WinThreshold" -InstallDns:$true -LogPath "C:\Windows\NTDS" -NoRebootOnCompletion:$false -SysvolPath "C:\Windows\SYSVOL" -Force:$true -SkipPreChecks -SafeModeAdministratorPassword $SMAP
+
+# Restart the server to complete the AD DS installation
+Restart-Computer -Force
+
+# Create a test user
+$securePassword = ConvertTo-SecureString -String "@(#*fsklnEFJnfisaf@#98h9)" -AsPlainText -Force
+New-ADUser -Name "TestUser" -SamAccountName "TestUser" -UserPrincipalName "TestUser@testdomain.local" -GivenName "Test" -Surname "User" -Enabled $true -PasswordNeverExpires $true -AccountPassword $securePassword
+
+# Create a test group
+New-ADGroup -Name "TestGroup" -SamAccountName "TestGroup" -GroupScope Global -GroupCategory Security
+
+# Add the test user to the test group
+Add-ADGroupMember -Identity "TestGroup" -Members "TestUser"
+
+# Configure Kerberos authentication
+$domainDns = (Get-ADDomain).DNSRoot
+Set-ADDomainMode -Identity $domainDns -DomainMode Windows2016Domain
+
+# Restart the server to apply changes
+Restart-Computer -Force
