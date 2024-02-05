@@ -76,12 +76,6 @@ variable "SafeModeAdministratorPassword" {
   sensitive   = true
 }
 
-variable "Domain_User_Password" {
-  description = "Password for AD Safe Mode recovery"
-  type        = string
-  sensitive   = true
-}
-
 # Variable input for the domain_configuration.ps1 script
 data "template_file" "domainConfig" {
   template = file("domainConfig.ps1")
