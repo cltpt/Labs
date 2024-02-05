@@ -5,16 +5,6 @@
 - [Prereqs](#Prereqs)
 - [Instructions](#Instructions)
 
-**To Do:**
-- Add documentation about installing into NTAuth and NTAuthCA stores
-  https://docs.aws.amazon.com/whitepapers/latest/access-workspaces-with-access-cards/import-the-issuing-ca-certificate-into-the-enterprise-ntauth-store.html
-- Add documentation about the fixes (https://posts.specterops.io/certificates-and-pwnage-and-patches-oh-my-8ae0f4304c1d)
-
-**Improvements:**
-- Document how "Passthecert" module can still lead to escalations even if you remove the CA from the NTAuth store https://nitter.ktachibana.party/techspence/status/1674047137460498432#m
-- Document new attack techniques (https://heartburn.dev/exploiting-active-directory-certificate-services-esc11-walkthrough/)
-- Add a managed identity to the adcs VM with VM reader to allow pulling the IP so in the powershell script you don't have to manually enter in the IP address
-- Identify a way to auto-configure the domain without lab-users run the domain config commands
 
 ## Introduction
 
@@ -65,6 +55,8 @@ $\textcolor{red}{\textsf{**Legal disclaimer:**}}$ Please do NOT utilize these te
 Before you begin this lab, $\textcolor{orange}{\textsf{ensure that you have adequate time allotted to allow the Azure resources to deploy}}$ but also to run the setup commands necessary to lay the groundwork for this lab.  Please understand that the Azure resources will likely take anywhere from $\textcolor{orange}{\textsf{10-15 minutes to fully deploy}}$.  One issue in particular is the deployment time of the Azure Bastion.  In my test deployments the Bastion alone would take 9 minutes to deploy.  Additionally, I always try and $\textcolor{orange}{\textsf{allow additional time to allow the extensions to run}}$ in the VMs.  Patience is key oftentimes with Azure and it is common theme with getting this lab setup and configured.
 
 Also, keep an eye out for the 3 VMs deployed and an Azure Bastion with a public IP address; $\textcolor{orange}{\textsf{this lab will run up costs}}$.  You can choose lower specs on the virtual machines but if you're waiting 10-15 minutes for a lab to deploy, you probably don't want to wait more time while the windows machines process what you're asking them to do.  Ensure that if you plan on playing around with this lab for a few weeks to de-provision your Azure bastion and public IP address when you leave it.  $\textcolor{orange}{\textsf{Be sure to also fully STOP your virtual machines in the portal (or CLI) to fully de-allocate the resources}}$  and save on cost.  
+
+As Microsoft releases patches to make these escalations more difficult you may see some of these escalations break.  SpecterOps released a blog post about how this happened for some of the escalations (https://posts.specterops.io/certificates-and-pwnage-and-patches-oh-my-8ae0f4304c1d).  If you see that any of the escalations have broken, please submit an issue on the repo and let me know!
 
 ## Prereqs
 
@@ -534,60 +526,86 @@ Certify.exe request /ca:ADCSVM.testdomain.local\testca.testdomain.local /enrollc
 
 Congrats!  Now you can follow the previous steps as in ESC1 to request a TGT under the guise of the adcsuser!
 
-#### Step 11: Exploit an insecure certificate template (ESC 3)
-$\textcolor{orange}{\textsf{THESE ESC INSTRUCTIONS ARE UNDER CONSTRUCTION}}$
+1. Now that we have the certificate on behalf of the other user, we can request a tgt on behalf of the adcsuser.  Make sure to copy the pfx into where you compiled your Rubeus.exe.
+```cmd
+Rubeus.exe asktgt /user:adcsuser /certificate:mycert.pfx /password:Password123! /ptt
+```
+2. Now that we've gotten a new tgt, we can run the previous command from ESC1 to browse in the DC's C drive.
+```cmd
+dir \\DCVM.testdomain.local\c$
+```
 
-This escalation relies on misconfigured enrollment agent templates.  This scenario is similar to that of the ESC1 however it requires an extra step.  Long story short enrollment agent templates allow you to enroll for a certificate on-behalf-of another user.  The EKU that this escalation relies on is called the "certificate request agent".  Let's go ahead and configure a certificate template to have that EKU.
+#### Step 11: Exploit an insecure certificate template (ESC 3)
+
+This escalation relies on misconfigured enrollment agent templates.  This scenario is similar to that of the ESC2.  Long story short enrollment agent templates allow you to enroll for a certificate on-behalf-of another user.  The EKU that this escalation relies on is called the "certificate request agent".  Let's go ahead and configure a certificate template to have that EKU.
 
 Setup the first misconfigured template:
 1. Click on the windows button in the lower left hand corner of your screen
 2. Type in Certification Authority and click on the icon
 3. Find the folder for "Certificate Templates"
 4. Right click on the "Certificate Templates" folder and click on "Manage"
-5. Find the "UserInsecureESC2" Certificate template and right click on it
+5. Find the "User" Certificate template and right click on it
 6. Click "Duplicate"
 7. In the newly opened window click into the "General" tab and rename the template to "UserInsecureESC3"
-8. Then you'll want to go to the "Extensions" tab and go to "Application Policies" and add in the "Certificate Request Agent" EKU. You can remove the other "Any Purpose" EKU as well as the "Client Authentication" EKU
-9. Click "OK"
+8. Then you'll want to go to the "Extensions" tab and go to "Application Policies" and remove all of the EKUs and add only the "Certificate Request Agent" EKU, then click "OK"
+9. Navigate to the "Subject Name" tab and remove the "Include e-mail name in subject name" and "E-mail name" checkboxes
 10. Click "Apply" and then "OK"
 11. We're not done yet.  Now we need to publish the template so go back to the main certificate authority console where you originally right clicked on "Certificate Templates"
 12. Right click on the "Certificate Templates" folder again click "New" -> "Certificate Template to issue"
 13. Find and click on the certificate template that we just created "UserInsecureESC3" and click "OK"
 14. You may need to wait 60 seconds or so for this template to publish out to AD but since this is a tiny one DC domain, it should publish very fast.
 
-Setup the second misconfigured template: **CHECK THESE**
-1. Click on the windows button in the lower left hand corner of your screen
-2. Type in Certification Authority and click on the icon
-3. Find the folder for "Certificate Templates"
-4. Right click on the "Certificate Templates" folder and click on "Manage"
-5. Find the "UserInsecureESC3" Certificate template and right click on it
-6. Click "Duplicate"
-7. In the newly opened window click into the "General" tab and rename the template to "UserInsecureESC3da"
-8. Then you'll want to go to the "Issuance Requirements" tab and check the box for "CA Certificate Manager Approval", "This number of authorized signatures" (1), and then select the Application policy for the "Policy type required in signature as well as choosing the "Certificate Request Agent" Application Policy. You can also add the "Client Authentication" EKU
-9. Click "OK"
-10. Click "Apply" and then "OK"
-11. We're not done yet.  Now we need to publish the template so go back to the main certificate authority console where you originally right clicked on "Certificate Templates"
-12. Right click on the "Certificate Templates" folder again click "New" -> "Certificate Template to issue"
-13. Find and click on the certificate template that we just created "UserInsecureESC3da" and click "OK"
-14. You may need to wait 60 seconds or so for this template to publish out to AD but since this is a tiny one DC domain, it should publish very fast.
+Now we need to enroll in this certificate.  Open up a session with your TestUser user in the USERVM.  Then run the following commands:
 
-Now that we've configured both misconfigured templates, we can go ahead and execute the exploit.  This time we will use the Certify tool to speed up our attack.  
-1. Click on the Windows button
-2. Open up a command prompt
-3. Navigate to where your Certify.exe file exists
-4. Run the following command
+1. Click on the windows button and type in "Run", hit enter to open up the run prompt
+2. Type in "certmgr.msc" and hit enter
+3. Navigate to the personal folder under the user's certificate store and then click into "Certificates"
+4. Right click in the white space and click "All Tasks" -> "Request new certificate"
+5. Click "Next" and "Next"
+6. On the certificate template selector, click on the UserInsecureESC3 template and click "Enroll"
+7. Congrats!  Now we have a certificate that will allow us to do anything a certificate can possibly do!
+
+Now let's export our certificate and move it to where we'll run Certify.exe again
+
+1. Right click on the certificate just issued and click "All Tasks" --> "Export"
+2. Click "Next"
+3. Check the "Yes, export the private key"
+4. Leave all the defaults on the Export file format page
+5. Set a password such as Password123!
+6. Change the encryption to "AES256-SHA256" and click "Next"
+7. Choose the file location where the Certify.exe is stored and name the file mycert (the extension will be automatically added)
+8. Click "Export"
+
+Given the User template already exists we can utilize that as the secondary vulnerable template here.  A key note about this escalation is that it requires that "The template schema version 1 or is greater than 2 and specifies an Application Policy Issuance Requirement requiring the Certificate Request Agent EKU."
+
+Now that we've configured our misconfigured template, we can go ahead and execute the exploit.
+
 ```cmd
-certify.exe request /ca:testca.testdomain.local\testca /template:UserInsecureESC3
+Certify.exe request /ca:ADCSVM.testdomain.local\testca.testdomain.local /enrollcert:mycert.pfx /enrollcertpw:Password123! /template:User /onbehalfof:testdomain\adcsuser
 ```
-**Verify the CA Name here**
-5. Combine into .pfx??? **Verify**
-6. Using the enrollment agent cert we will submit a request for a certificate on behalf of another user
+
+You should now receive a certificate and private key from the CA!  You'll need to follow these steps to get it into a format so we can send it to the KDC.
+
+1. Copy the entire private key and certificate (from the -----BEGIN RSA PRIVATE KEY----- all the way to the -----END CERTIFICATE-----, inclusive of those "headers" and "footers")
+2. Utilizing your command prompt open up notepad session in your Certify folder(do not try and create a text document and paste in the contents as it will append the .txt and mess up the file).
+
 ```cmd
-certify.exe request certify.exe request /ca:testca.testdomain.local\testca /template:UserInsecureESC3da /onbehalfof:TESTDOMAIN\adcsuser /enrollcert:ESC3.pfx /enrollcertpw:asdf123!
+notepad.exe cert.pem
 ```
+![My Image](notepad.png)
+
+3. Paste in the private key and certificate
+4. Open up git bash (because it has openssl pre-installed) and navigate to your Certify folder where you've just created the cert.pem file
+5. Run the following openssl command to convert the cert into a .pfx file
+6. Note you won't see any output except for the file being created in the folder
+
+```cmd
+openssl pkcs12 -password pass:Password123! -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provider v1.0" -export -out cert.pfx
+```
+
 7. Now that we have the certificate on behalf of the other user, we can request a tgt on behalf of the adcsuser.  Make sure to copy the pfx into where you compiled your Rubeus.exe.
 ```cmd
-Rubeus.exe asktgt /user:TESTDOMAIN\adcsuser /certificate:ESC3.pfx /password:asdf123!
+Rubeus.exe asktgt /user:TESTDOMAIN\adcsuser /certificate:cert.pfx /password:Password123! /ptt
 ```
 8. Now that we've gotten a new tgt, we can run the previous command from ESC1 to browse in the DC's C drive.
 ```cmd
@@ -595,31 +613,14 @@ dir \\DCVM.testdomain.local\c$
 ```
 
 #### Step 12: Exploit an insecure certificate template access control (ESC 4)
+
 $\textcolor{orange}{\textsf{THESE ESC INSTRUCTIONS ARE UNDER CONSTRUCTION}}$
 
-This particular escalation is targeted at overly permissive ACLs on a certificate template allowing lower-privileged users to change settings on a template in which they shouldn't be allowed.
-
-Let's setup an insecure template for this escalation:
-1. Click on the windows button in the lower left hand corner of your screen
-2. Type in Certification Authority and click on the icon
-3. Find the folder for "Certificate Templates"
-4. Right click on the "Certificate Templates" folder and click on "Manage"
-5. Find the "UserInsecureESC2" Certificate template and right click on it
-6. Click "Duplicate"
-7. In the newly opened window click into the "General" tab and rename the template to "UserInsecureESC4"
-8. Then you'll want to go to the "Subject Name" tab and change the "Supply in Request" to "Built from Active Directory.
-9. Then, go to the "Security" tab and under "Authenticated Users" add the "Write" and "Full Control" permissions to the template.
-10. Click "OK"
-11. Click "Apply" and then "OK"
-12. We're not done yet.  Now we need to publish the template so go back to the main certificate authority console where you originally right clicked on "Certificate Templates"
-13. Right click on the "Certificate Templates" folder again click "New" -> "Certificate Template to issue"
-14. Find and click on the certificate template that we just created "UserInsecureESC3" and click "OK"
-15. You may need to wait 60 seconds or so for this template to publish out to AD but since this is a tiny one DC domain, it should publish very fast. 
-
-**More to come here on this escalation**
-https://github.com/cfalta/PoshADCS
+---
 
 $\textcolor{orange}{\textsf{Skipping ESC 5 as it less applicable to this lab}}$
+
+---
 
 #### Step 13: Exploit an insecure certificate template access control (ESC 6)
 While I was initially going to cover this escalation, Microsoft released a patch that broke a majority of ESC6.  Therefore, we won't be covering this as it's more of a niche privilege escalation.  See the screenshot below on when it is exploitable.
@@ -635,3 +636,10 @@ Now that you've completed each escalation on here, tested only a few escalations
 ```
 terraform destroy -var-file="secret.tfvars"
 ```
+
+**Improvements:**
+- Go through and complete the documentation for ESC4
+- Document how "Passthecert" module can still lead to escalations even if you remove the CA from the NTAuth store https://nitter.ktachibana.party/techspence/status/1674047137460498432#m
+- Document new attack techniques (https://heartburn.dev/exploiting-active-directory-certificate-services-esc11-walkthrough/)
+- Add a managed identity to the adcs VM with VM reader to allow pulling the IP so in the powershell script you don't have to manually enter in the IP address
+- Identify a way to auto-configure the domain without lab-users run the domain config commands
