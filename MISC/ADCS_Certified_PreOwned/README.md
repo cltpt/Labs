@@ -616,6 +616,8 @@ dir \\DCVM.testdomain.local\c$
 
 $\textcolor{orange}{\textsf{THESE ESC INSTRUCTIONS ARE UNDER CONSTRUCTION}}$
 
+https://www.fortalicesolutions.com/posts/adcs-playing-with-esc4
+
 ---
 
 $\textcolor{orange}{\textsf{Skipping ESC 5 as it less applicable to this lab}}$
