@@ -19,7 +19,7 @@ Please do not simply deploy these tf files into production with no editing / con
 
 ### Pre-requsites
 1. Have an AWS account in which you have access to create resources and manage IAM
-2. Have terraform installed on your local system [Terraform install docs](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)S
+2. Have terraform installed on your local system [Terraform install docs](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
 3. Have AWS CLI installed on your local system to configure your access and secret keys [AWS CLI Install docs](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 
 ### Step 1: Review the picture of how this deployment functions
